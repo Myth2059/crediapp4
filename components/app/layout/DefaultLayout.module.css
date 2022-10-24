@@ -1,0 +1,14 @@
+.Trigger > span {
+  transform: rotateY(180deg);
+  margin-right: 0px;
+}
+.Trigger {
+  padding-right: 2px;
+}
+.Sider > div + span {
+  width: 0px;
+}
+.X {
+  transition: width 0.15s linear;
+  width: 0;
+}
