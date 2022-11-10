@@ -1,4 +1,4 @@
-import { Button, Input, Space, Table } from "antd";
+import { Button, Divider, Dropdown, Input, Radio, RadioChangeEvent, Space, Table } from "antd";
 import { SearchOutlined } from '@ant-design/icons';
 import type { InputRef } from 'antd';
 import { ColumnsType, ColumnType } from "antd/lib/table";
@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import Highlighter from 'react-highlight-words';
 import CustomCard from "../components/app/CustomFormCard/CustomCard";
 import DefaultLayout from "../components/app/layout/DefaultLayout";
+
 
 
 type DataIndex = keyof datosCobros;
@@ -24,7 +25,7 @@ const Datos: datosCobros[] = [{
      Valor: 60000
 },
 {
-     key: "2",
+     key: "3",
      Cobro: "tribuno",
      Cobrador: "Jimena",
      Clientes: 166,
@@ -32,7 +33,198 @@ const Datos: datosCobros[] = [{
      Valor: 650000
 },
 {
-     key: "3",
+     key: "4",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+}
+     ,
+{
+     key: "5",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+}
+     ,
+{
+     key: "6",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+}
+     ,
+{
+     key: "7",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+}
+     ,
+{
+     key: "8",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+}
+     ,
+{
+     key: "9",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+}
+     ,
+{
+     key: "10",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+}
+     ,
+{
+     key: "11",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "12",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "13",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "14",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "15",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "16",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "17",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "18",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "19",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "20",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "21",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "22",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "23",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "24",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "25",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "26",
+     Cobro: "congreso",
+     Cobrador: "Sandra",
+     Clientes: 19,
+     Creditos: 24,
+     Valor: 100000
+},
+{
+     key: "27",
      Cobro: "congreso",
      Cobrador: "Sandra",
      Clientes: 19,
@@ -48,96 +240,46 @@ const Datos: datosCobros[] = [{
 
 export default function Cobros() {
      const [searchText, setSearchText] = useState('');
-     const [searchedColumn, setSearchedColumn] = useState('');
-     const searchInput = useRef<InputRef>(null);
+     const [columna, setColumna] = useState("Cobro");
+     const [height, setHeight] = useState(0);
+     const ref = useRef<HTMLDivElement>(null);
 
+     useEffect(() => {
+          if (ref.current != null) {
+               setHeight(ref.current.clientHeight)
+               console.log(ref.current.clientHeight)
+          }
+     })
 
+     function timerHeigt(fn: () => void, ms: number) {
+          var timer: NodeJS.Timeout;
+          return () => {
+               clearTimeout(timer);
+               timer = setTimeout(fn, ms);
 
-     const handleSearch = (
-          selectedKeys: string[],
-          confirm: (param?: FilterConfirmProps) => void,
-          dataIndex: DataIndex,
-     ) => {
-          console.log(selectedKeys);
-          console.log(dataIndex);
-          confirm();
-          setSearchText(selectedKeys[0]);
-          setSearchedColumn(dataIndex);
-     };
+          }
+     }
 
-     const handleReset = (clearFilters: () => void) => {
-          clearFilters();
-          setSearchText('');
-     };
+     useEffect(() => {
+          const changeHeight = timerHeigt(() => {
+               if (ref.current != null) {
 
-
-     const getColumnSearchProps = (dataIndex: DataIndex): ColumnType<datosCobros> => ({
-          filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-               <div style={{ padding: 8 }}>
-                    <Input
-                         ref={searchInput}
-                         placeholder={`Search ${dataIndex}`}
-                         value={selectedKeys[0]}
-                         onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-                         onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-                         style={{ marginBottom: 8, display: 'block' }}
-                    />
-                    <Space>
-                         <Button
-                              type="primary"
-                              onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-                              icon={<SearchOutlined />}
-                              size="small"
-                              style={{ width: 90 }}
-                         >
-                              Search
-                         </Button>
-                         <Button
-                              onClick={() => clearFilters && handleReset(clearFilters)}
-                              size="small"
-                              style={{ width: 90 }}
-                         >
-                              Reset
-                         </Button>
-                         <Button
-                              type="link"
-                              size="small"
-                              onClick={() => {
-                                   confirm({ closeDropdown: false });
-                                   setSearchText((selectedKeys as string[])[0]);
-                                   setSearchedColumn(dataIndex);
-                              }}
-                         >
-                              Filter
-                         </Button>
-                    </Space>
-               </div>
-          ),
-          filterIcon: (filtered: boolean) => (
-               <SearchOutlined style={{ color: filtered ? '#1890ff' : undefined }} />
-          ),
-          onFilter: (value, record) =>
-               record[dataIndex]
-                    .toString()
-                    .toLowerCase()
-                    .includes((value as string).toLowerCase()),
-          onFilterDropdownOpenChange: visible => {
-               if (visible) {
-                    setTimeout(() => searchInput.current?.select(), 100);
+                    setHeight(ref.current.clientHeight);
+                    console.log("HandleResize " + ref.current.clientHeight);
                }
-          },
-          render: text =>
-               searchedColumn === dataIndex ? (
-                    <Highlighter
-                         highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-                         searchWords={[searchText]}
-                         autoEscape
-                         textToHighlight={text ? text.toString() : ''}
-                    />
-               ) : (
-                    text
-               ),
-     });
+          }, 50);
+
+          window.addEventListener("resize", changeHeight)
+
+          return () => { window.removeEventListener("resize", changeHeight) }
+     })
+
+
+
+
+
+
+
 
 
      const columns: ColumnsType<datosCobros> = [
@@ -155,9 +297,17 @@ export default function Cobros() {
                     }
                     return 0;
                },
-               render: (cobro) => (<><Link href={"/" + cobro}><a>{cobro}</a></Link></>),
+               render: (cobro) => (<><Link href={"/cobros/" + cobro}><a>{cobro}</a></Link></>),
                align: "center",
-               className: "text-xs"
+               className: "text-xs",
+               filteredValue: [""],
+
+               onFilter: (value, record) => {
+                    if (columna == "Cobro") {
+                         return record.Cobro.toLowerCase().includes(searchText.toLowerCase())
+                    }
+                    return true;
+               },
 
           },
           {
@@ -174,8 +324,17 @@ export default function Cobros() {
                     }
                     return 0;
                }, align: "center",
-               ...getColumnSearchProps("Cobrador"),
-               className: "text-xs"
+               className: "text-xs",
+               filteredValue: [""],
+
+               onFilter: (value, record) => {
+                    if (columna == "Cobrador") {
+
+                         return record.Cobrador.toLowerCase().includes(searchText.toLowerCase())
+                    }
+                    return true;
+               },
+
           },
           {
                title: "Cltes",
@@ -199,6 +358,7 @@ export default function Cobros() {
                render: (valor: number) => ("$" + valor.toLocaleString("es-CO")),
                align: "center",
                className: "text-xs"
+
           }
 
      ]
@@ -210,12 +370,37 @@ export default function Cobros() {
           setWidth(window.innerWidth);
      }, [])
 
+     const radioOnChange = (e: RadioChangeEvent) => {
+          setColumna(e.target.value)
+     }
+
+
+
+     const overlay = (<div className="bg-white shadow-md rounded-md p-4 w-60">
+          <Input allowClear={true} onChange={(e) => setSearchText(e.currentTarget.value)} />
+          <Radio.Group onChange={radioOnChange} value={columna} className="!mt-4">
+               <Radio value={"Cobro"}>Cobro</Radio>
+               <Radio value={"Cobrador"}>Cobrador</Radio>
+          </Radio.Group>
+
+     </div>)
+
      return <DefaultLayout>
 
-          <div className="w-full flex  justify-center p-4">
-               <CustomCard className="w-[900px] p-3">
-                    <div className=""></div>
-                    <Table dataSource={Datos} size={width < 500 ? "small" : "middle"} columns={columns}>
+          <div className="w-full h-full flex justify-center p-4">
+               <CustomCard className="w-[900px] p-3 flex flex-col min-h-[calc(100vh-78px)] h-[calc(100vh-78px)] max-h-[calc(100vh-45px)]" ref={ref}>
+                    <div className="flex w-full justify-between">
+                         <span className="font-semibold"> Lista de Cobros</span>
+
+                         <Dropdown overlay={overlay} placement="bottomRight">
+
+                              <a >
+                                   <SearchOutlined style={{ color: '#1890ff' }} />
+                              </a>
+                         </Dropdown>
+                    </div>
+                    <Divider style={{ margin: "12px 0px" }} />
+                    <Table pagination={{ disabled: true, position: ["none", "none"], defaultPageSize: 500 }} dataSource={Datos} size={width < 500 ? "small" : "middle"} columns={columns} scroll={{ y: (height - 111) }} >
 
                     </Table>
                </CustomCard>

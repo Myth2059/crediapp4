@@ -5,10 +5,25 @@
 .Trigger {
   padding-right: 2px;
 }
+.Sider2 {
+  position: absolute;
+  height: 100vh;
+  z-index: 999;
+}
+.Sider2 > div {
+  z-index: 10;
+  position: relative;
+  background-color: white;
+}
+.Sider2 > div + span {
+  z-index: 1;
+
+  transition: transform 0.35s;
+}
+
 .Sider > div + span {
-  width: 0px;
+  transform: translateX(-37px);
 }
 .X {
-  transition: width 0.15s linear;
   width: 0;
 }

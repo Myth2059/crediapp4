@@ -14,6 +14,10 @@ module.exports = {
             'arena':'#ba895d',
             'arena-oscura':'#a26d3c'
           },
+          screens:{
+               'sm': {'max': '639px'},
+               // => @media (max-width: 639px) { ... }
+          }
     },
   },
   plugins: [],
