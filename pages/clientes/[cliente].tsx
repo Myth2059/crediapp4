@@ -1,5 +1,5 @@
 import { Button, Collapse, Image } from "antd";
-import { useEffect, useState } from "react";
+import { FC, ReactNode, useEffect, useState } from "react";
 import CuadriculaCuotas from "../../components/app/Cuadricula/CuadriculaCuotas";
 import CustomCard from "../../components/app/CustomFormCard/CustomCard";
 import CustomTable from "../../components/app/CustomTable/CustomTable";
@@ -8,24 +8,25 @@ import type { ColumnsType } from "antd/es/table";
 import _ from "lodash";
 import { faker } from "@faker-js/faker";
 import moment from "moment";
-import { Swiper, SwiperSlide } from "swiper/react"; import { Pagination } from "swiper";
-import { MdOutlineDelete } from "react-icons/md";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper";
+import { RiDeleteBin2Line } from "react-icons/ri";
 import dynamic from "next/dynamic";
 import React from "react";
+import ReactDOM from "react-dom";
+import { useRouter } from "next/router";
 
 
 
-var historial: Historial[] = [];
 
-for (let index = 0; index < 4; index++) {
-     historial.push({
-          Motivo: _.random(1) == 1 ? "Pago" : "Transferencia",
-          Fecha: faker.date.between("2022-10-31", "2022-11-06"),
-          Observacion: faker.lorem.sentence(),
-     });
-}
+//Variables Externas//
 
 const { Panel } = Collapse;
+
+/**
+ * Esta variable es la que almacen la configuracion
+ * de las columnas
+ */
 const columnsHistorial: ColumnsType<Historial> = [
      {
           title: "Motivo",
@@ -59,18 +60,40 @@ const columnsHistorial: ColumnsType<Historial> = [
           render: (x) => <span>{x}</span>,
      },
 ];
-{/* <li><MdOutlineDelete size={40} /></li> */ }
+
+
+//Fin Variables Externas//
 
 
 
-// var insertarBoton: HTMLCollection;
+
+
+
+
+
+
+
 export default function Cliente() {
+
+     //UseStates & useEffect//
      const [width, setWidth] = useState<number>(400);
      const [ready, setReady] = useState<boolean>(false);
      const [imageId, setImageId] = useState<number>(0);
-     const [insertarBoton, setInsertarBoton] = useState<HTMLCollection>();
-     const position = { lat: -24.893795, lng: -65.4867887 };
+     const [visible, setVisible] = useState<boolean>(false);
+     const [botonAgregado, setBotonAgregado] = useState<boolean>(false);
+     const router = useRouter();
 
+     //-----
+     useEffect(() => {
+          setReady(true);
+          setWidth(window.innerWidth);
+     }, []);
+     //Fin UseStates//
+
+     //Variables//
+     var historial: Historial[] = [];
+
+     const position = { lat: -24.893795, lng: -65.4867887 };
 
      const Map = React.useMemo(
           () =>
@@ -80,28 +103,47 @@ export default function Cliente() {
                }),
           []
      );
+
      var botonEliminar: HTMLElement;
-     if (ready) {
-          botonEliminar = document.createElement("li");
-          botonEliminar.innerHTML = "X";
-          botonEliminar.className = "";
-          botonEliminar.addEventListener("click", () => console.log(imageId));
+
+     interface containerProps {
+          cuadro: Element;
      }
-     useEffect(() => {
-          setReady(true);
 
-          // insertarBoton[0].appendChild(botonEliminar);
+     const Prueba23 = (Container: containerProps) => {
 
-
-     }, []);
-
-     const handlepruebainsert = () => {
-          setTimeout(() => {
-               const asd = document.getElementsByClassName("ant-image-preview-operations")[0];
-               asd.appendChild(botonEliminar);
-          }, 150);
+          return ReactDOM.createPortal(<li onClick={() => console.log(imageId)} className="-mb-[5px]"><RiDeleteBin2Line size={18} /></li>, Container.cuadro);
 
      }
+
+     const handlepruebainsert = (x: number) => {
+          setImageId(x);
+          if (!botonAgregado) {
+               setBotonAgregado(true);
+               setTimeout(() => {
+                    setVisible(true)
+
+               }, 150);
+          }
+     };
+
+
+     //Fin Variables//
+
+
+     //Funciones//
+     for (let index = 0; index < 4; index++) {
+          historial.push({
+               Motivo: _.random(1) == 1 ? "Pago" : "Transferencia",
+               Fecha: faker.date.between("2022-10-31", "2022-11-06"),
+               Observacion: faker.lorem.sentence(),
+          });
+     }
+     //--------
+
+     //Fin Funciones//
+
+
 
      return (
           <DefaultLayout>
@@ -113,6 +155,7 @@ export default function Cliente() {
                               <div className="flex gap-2 justify-evenly flex-wrap sm:justify-between  sm:[&>div]:min-w-[90px]  [&>div]:min-w-[100px] [&>div]:items-center [&>div]:flex [&>div]:flex-col [&>div>span:first-child]:text-arena [&>div>span:first-child]:font-semibold [&>div>span:first-child]:flex [&>div>span:first-child]:items-center">
                                    <div className="!sm:min-w-[90px]">
                                         <span>Nombre</span>
+                                        <RiDeleteBin2Line size={16} />
                                         <span>Andres Pastrana</span>
                                    </div>
                                    <div>
@@ -207,25 +250,43 @@ export default function Cliente() {
                                    </Swiper>
                               </div>
                          </CustomCard>
-                         <div className="flex gap-4 w-full sm:flex-col [&_.ant-collapse]:w-full ">
+                         <div className="flex gap-4 w-full sm:flex-col [&_.ant-collapse]:w-full [&_.ant-collapse-content-box]:flex [&_.ant-collapse-content-box]:gap-4 sm:[&_.ant-collapse-content-box]:justify-center [&_.ant-collapse-content-box]:flex-wrap ">
                               <Collapse>
                                    <Panel key={"1"} header={"Fotos"}>
                                         <Image.PreviewGroup>
                                              <Image
-                                                  onClick={handlepruebainsert}
-                                                  width={200}
+
+                                                  onClick={() => handlepruebainsert(1)}
+                                                  width={150}
+                                                  src="https://redgol.cl/__export/1586119895268/sites/redgol/img/2020/04/05/homero-simpson-1200x630_1.jpg_242310155.jpg"
+
+
+                                             />
+                                             <Image
+                                                  onClick={() => handlepruebainsert(2)}
+                                                  width={150}
                                                   src="https://redgol.cl/__export/1586119895268/sites/redgol/img/2020/04/05/homero-simpson-1200x630_1.jpg_242310155.jpg"
                                              />
-
+                                             <Image
+                                                  onClick={() => handlepruebainsert(3)}
+                                                  width={150}
+                                                  src="https://redgol.cl/__export/1586119895268/sites/redgol/img/2020/04/05/homero-simpson-1200x630_1.jpg_242310155.jpg"
+                                             />
                                         </Image.PreviewGroup>
                                    </Panel>
                                    <Panel key={"2"} header={"Maps"}>
-                                        <div className="w-full h-[300px]"><Map position={position} /></div>
+                                        <div className="w-full h-[300px]">
+                                             <Map position={position} />
+                                        </div>
                                         {/* {ready ?  : ""} */}
                                    </Panel>
                               </Collapse>
                          </div>
-                         <Button type="primary" onClick={() => console.log(botonEliminar)}>Presioname Duro</Button>
+                         {visible ? <Prueba23 cuadro={document.getElementsByClassName("ant-image-preview-operations")[0] as HTMLElement} /> : ""}
+                         <div id="prueba"></div>
+                         <Button type="primary" onClick={() => router.push('https://www.google.com.ar/maps/place/-24.89129884149519,+-65.49758661741734/@-24.89129884149519,+-65.49758661741734')}>
+                              Presioname Duro
+                         </Button>
                     </div>
                </div>
           </DefaultLayout>

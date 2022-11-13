@@ -37,9 +37,9 @@ export default function DefaultLayout(props: layoutProps) {
      const [width, setWidth] = useState<number>(600);
      useEffect(() => {
           setWidth(window.innerWidth);
-          // width > 760 ? setCollapse(false) : null;
+
      }, []);
-     console.log(collapse)
+
      return (
           <Layout className="h-full" hasSider={true}>
 
