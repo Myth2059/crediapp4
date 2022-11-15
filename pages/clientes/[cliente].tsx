@@ -1,5 +1,5 @@
 import { Button, Collapse, Image, Input, Modal, Table } from "antd";
-import { FC, ReactNode, useEffect, useState } from "react";
+import { FC, ReactNode, useEffect, useRef, useState } from "react";
 import CuadriculaCuotas from "../../components/app/Cuadricula/CuadriculaCuotas";
 import CustomCard from "../../components/app/CustomFormCard/CustomCard";
 import CustomTable from "../../components/app/CustomTable/CustomTable";
@@ -76,7 +76,7 @@ const columnsDirecciones: ColumnsType<Direcciones> = [
      }
 ]
 
-const pruebaDirecciones: Direcciones[] = [{ Direccion: "Soacha", Referencia: "Casa Jimena", Observacion: "La rica de jimena" }, { Direccion: "casa leo 123", Referencia: "Casa Hermano", Observacion: "Es donde todos van a comer, la casa es azul con bordo" }, { Direccion: "Juan Larran 240", Referencia: "Casa Abuela", Observacion: "El Perri" }, { Direccion: "Soacha", Referencia: "Casa Jimena", Observacion: "La rica de jimena" }, { Direccion: "casa leo 123", Referencia: "Casa Hermano", Observacion: "Es donde todos van a comer, la casa es azul con bordo" }, { Direccion: "Juan Larran 240", Referencia: "Casa Abuela", Observacion: "El Perri" }];
+const pruebaDirecciones: Direcciones[] = [{ Direccion: "Soacha", Referencia: "Casa Jimena", Observacion: " jimena" }, { Direccion: "casa leo 123", Referencia: "Casa Hermano", Observacion: "Es donde todos van a comer, la casa es azul con bordo" }, { Direccion: "Juan Larran 240", Referencia: "Casa Abuela", Observacion: "El Perri" }, { Direccion: "Soacha", Referencia: "Casa Jimena", Observacion: "La rica de jimena" }, { Direccion: "casa leo 123", Referencia: "Casa Hermano", Observacion: "Es donde todos van a comer, la casa es azul con bordo" }, { Direccion: "Juan Larran 240", Referencia: "Casa Abuela", Observacion: "El Perri" }];
 //Fin Variables Externas//
 
 
@@ -98,7 +98,8 @@ export default function Cliente() {
      const [botonAgregado, setBotonAgregado] = useState<boolean>(false);
      const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
      const [modalSelection, setModalSelection] = useState<"nombre" | "direccion" | "negocio" | undefined>(undefined);
-     const [rowIndex, setRowIndex] = useState<number | undefined>(undefined);
+     // const [rowIndex, setRowIndex] = useState<number | undefined>(undefined);
+     const rowIndex = useRef(0);
      const [loading, SetLoading] = useState<boolean>(false);
      const [direcciones, setDirecciones] = useState<Direcciones[]>([...pruebaDirecciones]);
      const router = useRouter();
@@ -108,7 +109,20 @@ export default function Cliente() {
           setReady(true);
           setWidth(window.innerWidth);
 
+          for (let index = 0; index < 4; index++) {
+               historial.push({
+                    Motivo: _.random(1) == 1 ? "Pago" : "Transferencia",
+                    Fecha: faker.date.between("2022-10-31", "2022-11-06"),
+                    Observacion: faker.lorem.sentence(),
+               });
+          }
+
      }, []);
+
+
+     // useEffect(() => {
+     //      console.log("Actualizado Index")
+     // }, [rowIndex])
      //Fin UseStates//
 
      //Variables//
@@ -131,13 +145,7 @@ export default function Cliente() {
 
 
      //Funciones//
-     for (let index = 0; index < 4; index++) {
-          historial.push({
-               Motivo: _.random(1) == 1 ? "Pago" : "Transferencia",
-               Fecha: faker.date.between("2022-10-31", "2022-11-06"),
-               Observacion: faker.lorem.sentence(),
-          });
-     }
+
      //--------
 
      //--------
@@ -151,6 +159,8 @@ export default function Cliente() {
                }, 150);
           }
      };
+
+     const setRowIndex = (val: number) => { rowIndex.current = val; console.log(val) };
 
      const Prueba23 = (Container: containerProps) => {
 
@@ -167,7 +177,7 @@ export default function Cliente() {
      );
 
      function InnerModal(props: ModalInterface) {
-          console.log("me ejecute")
+
           if (props.Tipo == "nombre") {
                return (
                     <div className="h-fit w-[220px] flex flex-col">
@@ -191,11 +201,11 @@ export default function Cliente() {
                          <span className="font-medium">Direcciones Registradas</span>
                          <hr className="my-2" />
                          <Table columns={columnsDirecciones} dataSource={pruebaDirecciones} scroll={{ y: "150px" }} onRow={(data, index) => {
-                              return { onClick: () => setRowIndex(index) }
+                              return { onClick: () => index != undefined ? setRowIndex(index) : setRowIndex(0) }
                          }} />
                          <hr className="my-2" />
                          <span className="font-medium">Observaciónes</span>
-                         {/* <TextArea readOnly defaultValue={rowIndex != undefined ? pruebaDirecciones[rowIndex].Observacion : ""} className="!h-[150px]" /> */}
+                         <TextArea readOnly defaultValue={rowIndex != undefined ? direcciones[rowIndex.current].Observacion : ""} className="!h-[150px]" />
 
 
                     </div>
