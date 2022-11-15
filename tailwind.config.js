@@ -17,7 +17,9 @@ module.exports = {
           screens:{
                'sm': {'max': '639px'},
                // => @media (max-width: 639px) { ... }
-          }
+          },animation: {
+               'spin-slow': 'spin 3s linear infinite',
+             }
     },
   },
   plugins: [],

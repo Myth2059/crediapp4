@@ -19,6 +19,9 @@ export default function CustomTable(props: customTableProps) {
      useEffect(() => {
           setEstado(props.mostrarCheckbox);
      }, [props.mostrarCheckbox]);
+
+
+
      var rowSelect1: TableProps<any> = {};
 
      /**
@@ -217,22 +220,26 @@ export default function CustomTable(props: customTableProps) {
                </Modal>
                <Table
                     {...rowSelect1}
-                    className={"flex flex-col overflow-y-auto  "}
-
+                    className={"flex flex-col overflow-y-auto  [&_.ant-table-cell-row-hover]:!bg-transparent [&_.ant-table-tbody]:group [&_.ant-table-tbody>tr]:group-hover:bg-black"}
                     size="small"
                     dataSource={props.dataSource}
                     columns={props.columns}
                     scroll={props.scroll != undefined ? { y: props.scroll } : {}}
-
                     pagination={{
                          disabled: true,
                          position: ["none", "none"],
                          defaultPageSize: 500,
                     }}
+                    onRow={(data, rowIndex) => {
+                         return {
+                              onClick: () => { props.columnIndex != undefined ? props.columnIndex(rowIndex) : "" }
+                         }
+                    }}
                />
           </div>
      );
 }
+
 
 interface customTableProps {
      columns?: ColumnsType<any>;
@@ -244,7 +251,13 @@ interface customTableProps {
       * Aca va el nombre de la tabla, el cual sera usado para mostrar en las opciones, el nombre debe ser en singular
       */
      tabla: "Cliente" | "Credito";
+     /**
+      * Se debe indicar el tamaño maximo que puede crecer el contenedor, antes de convertirse en scroll
+      */
      scroll?: number | string;
+     /** */
+     columnIndex?: (x: number | undefined) => void;
+
 
 }
 CustomTable.defaultProps = {
@@ -252,3 +265,4 @@ CustomTable.defaultProps = {
      mostrarCheckbox: false,
      tabla: "fila"
 };
+

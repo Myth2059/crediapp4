@@ -1,4 +1,4 @@
-import { Button, Collapse, Image } from "antd";
+import { Button, Collapse, Image, Input, Modal, Table } from "antd";
 import { FC, ReactNode, useEffect, useState } from "react";
 import CuadriculaCuotas from "../../components/app/Cuadricula/CuadriculaCuotas";
 import CustomCard from "../../components/app/CustomFormCard/CustomCard";
@@ -15,6 +15,9 @@ import dynamic from "next/dynamic";
 import React from "react";
 import ReactDOM from "react-dom";
 import { useRouter } from "next/router";
+import { MdGpsFixed } from "react-icons/md";
+import { IoReloadSharp } from "react-icons/io5";
+import TextArea from "antd/lib/input/TextArea";
 
 
 
@@ -62,6 +65,18 @@ const columnsHistorial: ColumnsType<Historial> = [
 ];
 
 
+const columnsDirecciones: ColumnsType<Direcciones> = [
+     {
+          title: "Dirección",
+          dataIndex: "Direccion"
+     },
+     {
+          title: "Referencia",
+          dataIndex: "Referencia"
+     }
+]
+
+const pruebaDirecciones: Direcciones[] = [{ Direccion: "Soacha", Referencia: "Casa Jimena", Observacion: "La rica de jimena" }, { Direccion: "casa leo 123", Referencia: "Casa Hermano", Observacion: "Es donde todos van a comer, la casa es azul con bordo" }, { Direccion: "Juan Larran 240", Referencia: "Casa Abuela", Observacion: "El Perri" }, { Direccion: "Soacha", Referencia: "Casa Jimena", Observacion: "La rica de jimena" }, { Direccion: "casa leo 123", Referencia: "Casa Hermano", Observacion: "Es donde todos van a comer, la casa es azul con bordo" }, { Direccion: "Juan Larran 240", Referencia: "Casa Abuela", Observacion: "El Perri" }];
 //Fin Variables Externas//
 
 
@@ -81,12 +96,18 @@ export default function Cliente() {
      const [imageId, setImageId] = useState<number>(0);
      const [visible, setVisible] = useState<boolean>(false);
      const [botonAgregado, setBotonAgregado] = useState<boolean>(false);
+     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+     const [modalSelection, setModalSelection] = useState<"nombre" | "direccion" | "negocio" | undefined>(undefined);
+     const [rowIndex, setRowIndex] = useState<number | undefined>(undefined);
+     const [loading, SetLoading] = useState<boolean>(false);
+     const [direcciones, setDirecciones] = useState<Direcciones[]>([...pruebaDirecciones]);
      const router = useRouter();
 
      //-----
      useEffect(() => {
           setReady(true);
           setWidth(window.innerWidth);
+
      }, []);
      //Fin UseStates//
 
@@ -95,37 +116,15 @@ export default function Cliente() {
 
      const position = { lat: -24.893795, lng: -65.4867887 };
 
-     const Map = React.useMemo(
-          () =>
-               dynamic(() => import("../../components/Map/customMap"), {
-                    loading: () => <span>Cargando...</span>,
-                    ssr: false,
-               }),
-          []
-     );
-
      var botonEliminar: HTMLElement;
 
      interface containerProps {
           cuadro: Element;
      }
 
-     const Prueba23 = (Container: containerProps) => {
 
-          return ReactDOM.createPortal(<li onClick={() => console.log(imageId)} className="-mb-[5px]"><RiDeleteBin2Line size={18} /></li>, Container.cuadro);
 
-     }
 
-     const handlepruebainsert = (x: number) => {
-          setImageId(x);
-          if (!botonAgregado) {
-               setBotonAgregado(true);
-               setTimeout(() => {
-                    setVisible(true)
-
-               }, 150);
-          }
-     };
 
 
      //Fin Variables//
@@ -141,6 +140,87 @@ export default function Cliente() {
      }
      //--------
 
+     //--------
+     const handlepruebainsert = (x: number) => {
+          setImageId(x);
+          if (!botonAgregado) {
+               setBotonAgregado(true);
+               setTimeout(() => {
+                    setVisible(true)
+
+               }, 150);
+          }
+     };
+
+     const Prueba23 = (Container: containerProps) => {
+
+          return ReactDOM.createPortal(<li onClick={() => console.log(imageId)} className="-mb-[5px]"><RiDeleteBin2Line size={18} /></li>, Container.cuadro);
+
+     }
+     const Map = React.useMemo(
+          () =>
+               dynamic(() => import("../../components/Map/customMap"), {
+                    loading: () => <span>Cargando...</span>,
+                    ssr: false,
+               }),
+          []
+     );
+
+     function InnerModal(props: ModalInterface) {
+          console.log("me ejecute")
+          if (props.Tipo == "nombre") {
+               return (
+                    <div className="h-fit w-[220px] flex flex-col">
+                         <span>Actualizar Nombre</span>
+                         <hr className="my-2" />
+
+                         <Input disabled={loading} className="text-center" defaultValue={"Michael Gonzalez"} />
+                         <hr className="my-2" />
+                         <div className="flex justify-between">
+                              <Button disabled={loading}>Cancelar</Button>
+                              <Button type="primary" loading={loading} onClick={() => SetLoading(!loading)} className="  !flex justify-center items-center text-gray-50">Actualizar</Button>
+                         </div>
+
+                    </div>
+               )
+
+          }
+          if (props.Tipo == "direccion") {
+               return (
+                    <div className="h-fit min-w-[330px] flex flex-col pb-2">
+                         <span className="font-medium">Direcciones Registradas</span>
+                         <hr className="my-2" />
+                         <Table columns={columnsDirecciones} dataSource={pruebaDirecciones} scroll={{ y: "150px" }} onRow={(data, index) => {
+                              return { onClick: () => setRowIndex(index) }
+                         }} />
+                         <hr className="my-2" />
+                         <span className="font-medium">Observaciónes</span>
+                         {/* <TextArea readOnly defaultValue={rowIndex != undefined ? pruebaDirecciones[rowIndex].Observacion : ""} className="!h-[150px]" /> */}
+
+
+                    </div>
+               )
+          }
+          if (props.Tipo == "negocio") {
+
+          }
+
+
+          return (<div>
+
+          </div>)
+     }
+
+     const HandleModal = (props: ModalInterface) => {
+          setModalSelection(props.Tipo);
+          setIsModalOpen(!isModalOpen)
+
+     }
+     const HandleModalClose = () => {
+          setIsModalOpen(!isModalOpen);
+          SetLoading(false);
+     }
+
      //Fin Funciones//
 
 
@@ -152,23 +232,27 @@ export default function Cliente() {
                          <CustomCard className="p-4 flex-col gap-2">
                               <span className="text-lg font-medium">Información del Cliente</span>
                               <hr />
-                              <div className="flex gap-2 justify-evenly flex-wrap sm:justify-between  sm:[&>div]:min-w-[90px]  [&>div]:min-w-[100px] [&>div]:items-center [&>div]:flex [&>div]:flex-col [&>div>span:first-child]:text-arena [&>div>span:first-child]:font-semibold [&>div>span:first-child]:flex [&>div>span:first-child]:items-center">
+                              <div className="flex  gap-2 justify-around flex-wrap sm:justify-between  sm:[&>div]:min-w-[90px]  [&>div]:min-w-[100px] [&>div]:items-center [&>div]:flex [&>div]:flex-col [&>div>span:first-child]:text-arena [&>div>span:first-child]:font-semibold [&>div>span:first-child]:flex [&>div>span:first-child]:items-center sm:text-[14px]">
                                    <div className="!sm:min-w-[90px]">
-                                        <span>Nombre</span>
-                                        <RiDeleteBin2Line size={16} />
+                                        <span onClick={() => HandleModal({ Tipo: "nombre" })} className="underline cursor-pointer select-none">Nombre</span>
                                         <span>Andres Pastrana</span>
+                                   </div>
+
+                                   <div >
+                                        <span onClick={() => HandleModal({ Tipo: "direccion" })} className="select-none cursor-pointer underline ">Direcciones</span>
+                                        <span>Juan Laperra 240</span>
+                                   </div>
+                                   <div>
+                                        <span>Creditos</span>
+                                        <span>3</span>
                                    </div>
                                    <div>
                                         <span>F.Ingreso</span>
                                         <span>06/06/2022</span>
                                    </div>
-                                   <div className=" sm:min-w-[90px]">
-                                        <span>Direcciones</span>
-                                        <span>Juan Laperra 240</span>
-                                   </div>
-                                   <div>
-                                        <span>Cdtos</span>
-                                        <span>3</span>
+                                   <div >
+                                        <span className="underline cursor-pointer select-none">T.Negocio</span>
+                                        <span>Verduleria</span>
                                    </div>
                                    <div>
                                         <span>Valor</span>
@@ -178,13 +262,21 @@ export default function Cliente() {
                                         <span>Calificación</span>
                                         <span>8/10</span>
                                    </div>
+                                   <Modal maskClosable={false} footer={null} okButtonProps={{ hidden: true }} open={isModalOpen} destroyOnClose={true} onCancel={HandleModalClose} className="!w-fit h- [&_.ant-modal-close-x]:!w-[30px] [&_.ant-modal-close-x]:!h-4 [&_.ant-modal-close-x]:!leading-[1.6rem] [&_.ant-modal-body]:!py-2 [&_.ant-modal-footer]:flex [&_.ant-modal-footer]:justify-center">
+                                        <InnerModal Tipo={modalSelection} />
+
+
+                                   </Modal>
+
+                                   {width < 900 ? <><div></div><div></div></> : ""}
+
                               </div>
                          </CustomCard>
-                         <CustomCard className=" flex-col w-full [&_.innerDiv]:!pb-6 [&_.innerDiv]:p-4 [&_.swiper-pagination]:!bottom-[2px] [&_.swiper-wrapper]:!w-full [&_.swiper-slide]:!w-full">
+                         <CustomCard className=" flex-col w-full [&_.innerDiv]:!pb-6 [&_.innerDiv]:p-4 [&_.innerDiv]:!pt-0 [&_.swiper-pagination]:!bottom-[2px] [&_.swiper-wrapper]:!w-full [&_.swiper-slide]:!w-full">
                               <span className="text-lg font-medium mb-2 px-4 pt-4">
                                    Creditos Activos
                               </span>
-                              <hr className="mb-2" />
+                              <hr className="mb-2 mx-4" />
                               <div className="w-full">
                                    <Swiper
                                         autoHeight={true}
@@ -272,9 +364,10 @@ export default function Cliente() {
                                                   width={150}
                                                   src="https://redgol.cl/__export/1586119895268/sites/redgol/img/2020/04/05/homero-simpson-1200x630_1.jpg_242310155.jpg"
                                              />
+                                             <div>asd</div>
                                         </Image.PreviewGroup>
                                    </Panel>
-                                   <Panel key={"2"} header={"Maps"}>
+                                   <Panel key={"2"} header={<div className="flex justify-between"><span>Maps</span><MdGpsFixed /></div>}>
                                         <div className="w-full h-[300px]">
                                              <Map position={position} />
                                         </div>
@@ -296,4 +389,16 @@ interface Historial {
      Motivo: string;
      Fecha: Date;
      Observacion: string;
+}
+interface Direcciones {
+     Direccion: string;
+     Referencia: string;
+     Observacion: string;
+     /**
+      * Verdadero si es la direccion principal del cliente
+      */
+     Principal?: boolean;
+}
+interface ModalInterface {
+     Tipo: "nombre" | "direccion" | "negocio" | undefined;
 }
