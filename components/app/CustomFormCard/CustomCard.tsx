@@ -5,6 +5,7 @@ import { ReactNode } from "react";
 
 
 const CustomCard = React.forwardRef<HTMLDivElement, customCardProps>((props, ref) => {
+     console.log("CustomCard me renderizo");
      return <div ref={ref} className={"w-full h-full flex shadow-md bg-white rounded " + props.className}>{props.children}</div>
 });
 

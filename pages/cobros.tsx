@@ -385,27 +385,28 @@ export default function Cobros() {
 
      </div>)
 
-     return <DefaultLayout>
+     return (
+          <DefaultLayout>
 
-          <div className="w-full h-full flex justify-center p-4">
-               <CustomCard className="w-[900px] p-3 flex flex-col min-h-[calc(100vh-78px)] h-[calc(100vh-78px)] max-h-[calc(100vh-45px)]" ref={ref}>
-                    <div className="flex w-full justify-between">
-                         <span className="font-semibold"> Lista de Cobros</span>
+               <div className="w-full h-full flex justify-center p-4">
+                    <CustomCard className="w-[900px] p-3 flex flex-col min-h-[calc(100vh-78px)] h-[calc(100vh-78px)] max-h-[calc(100vh-45px)]" ref={ref}>
+                         <div className="flex w-full justify-between">
+                              <span className="font-semibold"> Lista de Cobros</span>
 
-                         <Dropdown overlay={overlay} placement="bottomRight">
+                              <Dropdown overlay={overlay} placement="bottomRight">
 
-                              <a >
-                                   <SearchOutlined style={{ color: '#1890ff' }} />
-                              </a>
-                         </Dropdown>
-                    </div>
-                    <Divider style={{ margin: "12px 0px" }} />
-                    <Table pagination={{ disabled: true, position: ["none", "none"], defaultPageSize: 500 }} dataSource={Datos} size={width < 500 ? "small" : "middle"} columns={columns} scroll={{ y: (height - 111) }} >
+                                   <a >
+                                        <SearchOutlined style={{ color: '#1890ff' }} />
+                                   </a>
+                              </Dropdown>
+                         </div>
+                         <Divider style={{ margin: "12px 0px" }} />
+                         <Table pagination={{ disabled: true, position: ["none", "none"], defaultPageSize: 500 }} dataSource={Datos} size={width < 500 ? "small" : "middle"} columns={columns} scroll={{ y: (height - 111) }} >
 
-                    </Table>
-               </CustomCard>
-          </div>
-     </DefaultLayout>
+                         </Table>
+                    </CustomCard>
+               </div>
+          </DefaultLayout>)
 }
 
 interface datosCobros {

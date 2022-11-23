@@ -1,5 +1,5 @@
-import { Button, Collapse, Image, Input, Modal, Table } from "antd";
-import { FC, ReactNode, useEffect, useRef, useState } from "react";
+import { Button, Collapse, Image, Input, Modal } from "antd";
+import { useEffect, useRef, useState } from "react";
 import CuadriculaCuotas from "../../components/app/Cuadricula/CuadriculaCuotas";
 import CustomCard from "../../components/app/CustomFormCard/CustomCard";
 import CustomTable from "../../components/app/CustomTable/CustomTable";
@@ -16,8 +16,11 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { useRouter } from "next/router";
 import { MdGpsFixed } from "react-icons/md";
-import { IoReloadSharp } from "react-icons/io5";
+import { SiAddthis } from "react-icons/si";
 import TextArea from "antd/lib/input/TextArea";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { DatosApiCliente } from "../../utils/CafePruebas";
+import { ClienteInterface, Direccion } from "../../interfaces/Cliente";
 
 
 
@@ -65,21 +68,28 @@ const columnsHistorial: ColumnsType<Historial> = [
 ];
 
 
-const columnsDirecciones: ColumnsType<Direcciones> = [
+
+
+
+const columnsDirecciones: ColumnsType<Direccion> = [
      {
           title: "Dirección",
-          dataIndex: "Direccion"
+          dataIndex: "direccion",
+          render: ((value, record) => { return (record.principal ? <span>{value}<span className="text-[10px] text-emerald-green-2"> (Principal)</span></span> : <span>{value}</span>) })
      },
      {
           title: "Referencia",
-          dataIndex: "Referencia"
+          dataIndex: "referencia",
+
+
      }
 ]
 
-const pruebaDirecciones: Direcciones[] = [{ Direccion: "Soacha", Referencia: "Casa Jimena", Observacion: " jimena" }, { Direccion: "casa leo 123", Referencia: "Casa Hermano", Observacion: "Es donde todos van a comer, la casa es azul con bordo" }, { Direccion: "Juan Larran 240", Referencia: "Casa Abuela", Observacion: "El Perri" }, { Direccion: "Soacha", Referencia: "Casa Jimena", Observacion: "La rica de jimena" }, { Direccion: "casa leo 123", Referencia: "Casa Hermano", Observacion: "Es donde todos van a comer, la casa es azul con bordo" }, { Direccion: "Juan Larran 240", Referencia: "Casa Abuela", Observacion: "El Perri" }];
+
 //Fin Variables Externas//
 
 
+const imagenes: string[] = ["https://s2.dmcdn.net/v/SqfKZ1WNipVg5ti58/x240", "https://img-07.stickers.cloud/packs/65dfc4f0-c8a5-42a0-91c2-c77f2faf1549/webp/ff04dafc-3f60-414d-ab70-534177e19c72.webp", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQhLrq4s4xwmnVwnLBDcBPH7CZY4SSto1DoDA&usqp=CAU"];
 
 
 
@@ -87,8 +97,9 @@ const pruebaDirecciones: Direcciones[] = [{ Direccion: "Soacha", Referencia: "Ca
 
 
 
-
-export default function Cliente() {
+export default function Cliente({ data }: InferGetServerSidePropsType<ClienteInterface>) {
+     var datos: ClienteInterface = data;
+     // console.log(datos);
 
      //UseStates & useEffect//
      const [width, setWidth] = useState<number>(400);
@@ -96,12 +107,13 @@ export default function Cliente() {
      const [imageId, setImageId] = useState<number>(0);
      const [visible, setVisible] = useState<boolean>(false);
      const [botonAgregado, setBotonAgregado] = useState<boolean>(false);
-     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-     const [modalSelection, setModalSelection] = useState<"nombre" | "direccion" | "negocio" | undefined>(undefined);
-     // const [rowIndex, setRowIndex] = useState<number | undefined>(undefined);
-     const rowIndex = useRef(0);
+     const [isModalClienteOpen, setIsModalClienteOpen] = useState<boolean>(false);
+     const [isModalDireccionOpen, setIsModalDireccionOpen] = useState<boolean>(false);
+     const [isModalAddDirOpen, setIsModalAddDirOpen] = useState<boolean>(false);
+     const [isModalNegocioOpen, setIsModalNegocioOpen] = useState<boolean>(false);
+     const [rowIndex, setRowIndex] = useState<number | undefined>(undefined);
      const [loading, SetLoading] = useState<boolean>(false);
-     const [direcciones, setDirecciones] = useState<Direcciones[]>([...pruebaDirecciones]);
+     const [direcciones, setDirecciones] = useState<Direccion[]>([...datos.direccion]);
      const router = useRouter();
 
      //-----
@@ -120,10 +132,7 @@ export default function Cliente() {
      }, []);
 
 
-     // useEffect(() => {
-     //      console.log("Actualizado Index")
-     // }, [rowIndex])
-     //Fin UseStates//
+
 
      //Variables//
      var historial: Historial[] = [];
@@ -137,8 +146,107 @@ export default function Cliente() {
      }
 
 
+     const modalCliente = (
+          <div className="h-fit w-[220px] flex flex-col">
+               <span>Actualizar Nombre</span>
+               <hr className="my-2" />
 
+               <Input
+                    disabled={loading}
+                    className="text-center"
+                    defaultValue={datos.nombre}
+               />
+               <hr className="my-2" />
+               <div className="flex justify-between">
+                    <Button disabled={loading}>Cancelar</Button>
+                    <Button
+                         type="primary"
+                         loading={loading}
+                         onClick={() => SetLoading(!loading)}
+                         className="  !flex justify-center items-center text-gray-50"
+                    >
+                         Actualizar
+                    </Button>
+               </div>
+          </div>
+     );
 
+     const modalDireccion = (
+          <div className="h-fit w-[330px] flex flex-col pb-2">
+               <span className="font-medium">Direcciones Registradas</span>
+               <hr className="my-2" />
+               <CustomTable
+                    columns={columnsDirecciones}
+                    dataSource={direcciones}
+                    scroll={"150px"}
+                    columnIndex={(x) => {
+                         setRowIndex(x);
+                    }}
+               />
+               {/* <Tabla /> */}
+               <hr className="mt-1 mb-4" />
+               <div className="flex justify-between items-center mb-1">
+                    <span className="font-medium">Observaciónes</span>
+                    <a onClick={() => setIsModalAddDirOpen(true)}><SiAddthis size={15} /></a>
+                    <Modal maskClosable={false} footer={null} okButtonProps={{ hidden: true }} open={isModalAddDirOpen} destroyOnClose={true} onCancel={() => setIsModalAddDirOpen(false)} className="!w-fit h- [&_.ant-modal-close-x]:!w-[30px] [&_.ant-modal-close-x]:!h-4 [&_.ant-modal-close-x]:!leading-[1.6rem] [&_.ant-modal-body]:!py-2 [&_.ant-modal-footer]:flex [&_.ant-modal-footer]:justify-center">
+                         <div className="h-fit w-[330px] flex flex-col pb-2 gap-2">
+                              <div>
+                                   <span className="font-medium">Agregar Dirección</span>
+                                   <hr className="my-2" />
+                              </div>
+                              <div>
+                                   <span>Direccion</span>
+                                   <Input placeholder="" />
+                              </div>
+                              <div>
+                                   <span>Referencia</span>
+                                   <Input placeholder="" />
+                              </div>
+                              <div className="mb-2">
+                                   <span>Observación</span>
+                                   <TextArea className="!h-[100px]" />
+                              </div>
+                              <div className="flex justify-center w-full">
+                                   <Button type="primary">Guardar</Button>
+                              </div>
+                         </div>
+                    </Modal>
+               </div>
+               <TextArea
+
+                    readOnly
+                    value={
+                         rowIndex != undefined ? direcciones[rowIndex].observacion : ""
+                    }
+                    className="!h-[150px]"
+               />
+          </div>
+     );
+
+     const modalNegocio = (
+          <div className="h-fit w-[220px] flex flex-col">
+               <span>Actualizar Negocio</span>
+               <hr className="my-2" />
+
+               <Input
+                    disabled={loading}
+                    className="text-center"
+                    defaultValue={"Drogueria"}
+               />
+               <hr className="my-2" />
+               <div className="flex justify-between">
+                    <Button disabled={loading}>Cancelar</Button>
+                    <Button
+                         type="primary"
+                         loading={loading}
+                         onClick={() => SetLoading(!loading)}
+                         className="  !flex justify-center items-center text-gray-50"
+                    >
+                         Actualizar
+                    </Button>
+               </div>
+          </div>
+     );
 
 
      //Fin Variables//
@@ -160,7 +268,7 @@ export default function Cliente() {
           }
      };
 
-     const setRowIndex = (val: number) => { rowIndex.current = val; console.log(val) };
+
 
      const Prueba23 = (Container: containerProps) => {
 
@@ -176,58 +284,14 @@ export default function Cliente() {
           []
      );
 
-     function InnerModal(props: ModalInterface) {
-
-          if (props.Tipo == "nombre") {
-               return (
-                    <div className="h-fit w-[220px] flex flex-col">
-                         <span>Actualizar Nombre</span>
-                         <hr className="my-2" />
-
-                         <Input disabled={loading} className="text-center" defaultValue={"Michael Gonzalez"} />
-                         <hr className="my-2" />
-                         <div className="flex justify-between">
-                              <Button disabled={loading}>Cancelar</Button>
-                              <Button type="primary" loading={loading} onClick={() => SetLoading(!loading)} className="  !flex justify-center items-center text-gray-50">Actualizar</Button>
-                         </div>
-
-                    </div>
-               )
-
-          }
-          if (props.Tipo == "direccion") {
-               return (
-                    <div className="h-fit min-w-[330px] flex flex-col pb-2">
-                         <span className="font-medium">Direcciones Registradas</span>
-                         <hr className="my-2" />
-                         <Table columns={columnsDirecciones} dataSource={pruebaDirecciones} scroll={{ y: "150px" }} onRow={(data, index) => {
-                              return { onClick: () => index != undefined ? setRowIndex(index) : setRowIndex(0) }
-                         }} />
-                         <hr className="my-2" />
-                         <span className="font-medium">Observaciónes</span>
-                         <TextArea readOnly defaultValue={rowIndex != undefined ? direcciones[rowIndex.current].Observacion : ""} className="!h-[150px]" />
 
 
-                    </div>
-               )
-          }
-          if (props.Tipo == "negocio") {
 
-          }
-
-
-          return (<div>
-
-          </div>)
-     }
-
-     const HandleModal = (props: ModalInterface) => {
-          setModalSelection(props.Tipo);
-          setIsModalOpen(!isModalOpen)
-
-     }
      const HandleModalClose = () => {
-          setIsModalOpen(!isModalOpen);
+          setIsModalClienteOpen(false);
+          setIsModalDireccionOpen(false);
+          setIsModalNegocioOpen(false);
+          setRowIndex(undefined);
           SetLoading(false);
      }
 
@@ -238,45 +302,50 @@ export default function Cliente() {
      return (
           <DefaultLayout>
                <div className="w-full flex justify-center p-4 [&_img]:inline-block">
-                    <div className="w-[900px] flex flex-col gap-4">
+                    <div className="max-w-[900px] w-full flex flex-col gap-4">
                          <CustomCard className="p-4 flex-col gap-2">
                               <span className="text-lg font-medium">Información del Cliente</span>
                               <hr />
                               <div className="flex  gap-2 justify-around flex-wrap sm:justify-between  sm:[&>div]:min-w-[90px]  [&>div]:min-w-[100px] [&>div]:items-center [&>div]:flex [&>div]:flex-col [&>div>span:first-child]:text-arena [&>div>span:first-child]:font-semibold [&>div>span:first-child]:flex [&>div>span:first-child]:items-center sm:text-[14px]">
                                    <div className="!sm:min-w-[90px]">
-                                        <span onClick={() => HandleModal({ Tipo: "nombre" })} className="underline cursor-pointer select-none">Nombre</span>
-                                        <span>Andres Pastrana</span>
+                                        <span onClick={() => setIsModalClienteOpen(true)} className="underline cursor-pointer select-none">Nombre</span>
+                                        <span>{datos.nombre}</span>
+                                        <Modal maskClosable={false} footer={null} okButtonProps={{ hidden: true }} open={isModalClienteOpen} destroyOnClose={true} onCancel={HandleModalClose} className="!w-fit h- [&_.ant-modal-close-x]:!w-[30px] [&_.ant-modal-close-x]:!h-4 [&_.ant-modal-close-x]:!leading-[1.6rem] [&_.ant-modal-body]:!py-2 [&_.ant-modal-footer]:flex [&_.ant-modal-footer]:justify-center">
+                                             {modalCliente}
+                                        </Modal>
                                    </div>
 
                                    <div >
-                                        <span onClick={() => HandleModal({ Tipo: "direccion" })} className="select-none cursor-pointer underline ">Direcciones</span>
-                                        <span>Juan Laperra 240</span>
+                                        <span onClick={() => setIsModalDireccionOpen(true)} className="select-none cursor-pointer underline ">Direcciones</span>
+                                        <span>{datos.direccion.find((x) => x.principal == true)?.direccion}</span>
+                                        <Modal maskClosable={false} footer={null} okButtonProps={{ hidden: true }} open={isModalDireccionOpen} destroyOnClose={true} onCancel={HandleModalClose} className="!w-fit h- [&_.ant-modal-close-x]:!w-[30px] [&_.ant-modal-close-x]:!h-4 [&_.ant-modal-close-x]:!leading-[1.6rem] [&_.ant-modal-body]:!py-2 [&_.ant-modal-footer]:flex [&_.ant-modal-footer]:justify-center">
+                                             {modalDireccion}
+                                        </Modal>
                                    </div>
                                    <div>
                                         <span>Creditos</span>
-                                        <span>3</span>
+                                        <span>{datos.creditos.length}</span>
                                    </div>
                                    <div>
                                         <span>F.Ingreso</span>
-                                        <span>06/06/2022</span>
+                                        <span>{moment(datos.fIngreso).format("DD/MM/YYYY")}</span>
                                    </div>
                                    <div >
-                                        <span className="underline cursor-pointer select-none">T.Negocio</span>
-                                        <span>Verduleria</span>
+                                        <span className="underline cursor-pointer select-none" onClick={() => setIsModalNegocioOpen(true)}>T.Negocio</span>
+                                        <span >{datos.tNegocio}</span>
+                                        <Modal maskClosable={false} footer={null} okButtonProps={{ hidden: true }} open={isModalNegocioOpen} destroyOnClose={true} onCancel={HandleModalClose} className="!w-fit h- [&_.ant-modal-close-x]:!w-[30px] [&_.ant-modal-close-x]:!h-4 [&_.ant-modal-close-x]:!leading-[1.6rem] [&_.ant-modal-body]:!py-2 [&_.ant-modal-footer]:flex [&_.ant-modal-footer]:justify-center">
+                                             {modalNegocio}
+                                        </Modal>
                                    </div>
                                    <div>
                                         <span>Valor</span>
-                                        <span>85600</span>
+                                        <span>{datos.valor}</span>
                                    </div>
                                    <div>
                                         <span>Calificación</span>
-                                        <span>8/10</span>
+                                        <span>{datos.calificacion}/10</span>
                                    </div>
-                                   <Modal maskClosable={false} footer={null} okButtonProps={{ hidden: true }} open={isModalOpen} destroyOnClose={true} onCancel={HandleModalClose} className="!w-fit h- [&_.ant-modal-close-x]:!w-[30px] [&_.ant-modal-close-x]:!h-4 [&_.ant-modal-close-x]:!leading-[1.6rem] [&_.ant-modal-body]:!py-2 [&_.ant-modal-footer]:flex [&_.ant-modal-footer]:justify-center">
-                                        <InnerModal Tipo={modalSelection} />
 
-
-                                   </Modal>
 
                                    {width < 900 ? <><div></div><div></div></> : ""}
 
@@ -293,87 +362,104 @@ export default function Cliente() {
                                         pagination={{ clickable: true }}
                                         modules={[Pagination]}
                                         className="w-full max-w-full min-w-0 flex"
+                                        slidesPerView={1}
                                    >
-                                        <SwiperSlide>
-                                             <div className="innerDiv">
-                                                  <div className="flex mb-2  gap-2 justify-evenly flex-wrap sm:justify-between [&>div]:justify-center  sm:[&>div]:flex-col sm:[&>div]:w-[85px]  [&>div]:w-[120px] [&>div]:items-center [&>div]:flex [&>div>span:first-child]:mr-1 [&>div>span:first-child]:text-arena [&>div>span:first-child]:font-semibold [&>div>span:first-child]:flex [&>div>span:first-child]:items-center">
-                                                       <span className="flex sm:items-center w-[120px] justify-center font-medium text-emerald-green sm:flex-col sm:w-[85px]">
-                                                            <span>Credito #</span>{" "}
-                                                            <span className="sm:text-lg">1</span>
-                                                       </span>
-                                                       <div>
-                                                            <span>F.Inicio:</span>
-                                                            <span>10/06/22</span>
-                                                       </div>
-                                                       <div>
-                                                            <span>Pagado: </span>
-                                                            <span> $15600</span>
-                                                       </div>
-                                                       <div>
-                                                            <span>Deuda: {"    "}</span>
-                                                            <span> $4400</span>
-                                                       </div>
-                                                       <div>
-                                                            <span>Atraso: </span>
-                                                            <span> 3</span>
-                                                       </div>
-                                                       {width < 1309 ? <div></div> : ""}
-                                                  </div>
-                                                  <hr className="mb-3" />
-                                                  <div className="flex w-full flex-wrap justify-between [&>div]:w-[49%] sm:[&>div]:w-full mb-2 sm:gap-4">
-                                                       <div className=" justify-start items-center flex flex-col">
-                                                            <div className="w-fit sm:w-full">
-                                                                 <span className="w-full justify-start font-medium text-lg">
-                                                                      Cuotas
+                                        {datos.creditos.map((val, i) => {
+                                             return (
+                                                  <SwiperSlide>
+
+                                                       <div className="innerDiv ">
+                                                            <div className="flex mb-2  gap-2 justify-evenly flex-wrap sm:justify-between [&>div]:justify-center  sm:[&>div]:flex-col sm:[&>div]:w-[85px]  [&>div]:w-[120px] [&>div]:items-center [&>div]:flex [&>div>span:first-child]:mr-1 [&>div>span:first-child]:text-arena [&>div>span:first-child]:font-semibold [&>div>span:first-child]:flex [&>div>span:first-child]:items-center">
+                                                                 <span className="flex sm:items-center w-[120px] justify-center font-medium text-emerald-green sm:flex-col sm:w-[85px]">
+                                                                      <span>Credito #</span>{" "}
+                                                                      <span className="sm:text-lg">{val.creditoNum}</span>
                                                                  </span>
                                                                  <div>
-                                                                      <CuadriculaCuotas cuotas={26} fecha={[]} />
+                                                                      <span>F.Inicio:</span>
+                                                                      <span>{moment(val.fInicio).format("DD/MM/YYYY")}</span>
+                                                                 </div>
+                                                                 <div>
+                                                                      <span>Monto: </span>
+                                                                      <span> ${val.monto.toLocaleString("es-CO")}</span>
+                                                                 </div>
+                                                                 <div>
+                                                                      <span>Cuotas: </span>
+                                                                      <span> {val.numCuotas}</span>
+                                                                 </div>
+                                                                 <div>
+                                                                      <span>V/Cuota: </span>
+                                                                      <span> ${val.valorCuota.toLocaleString("es-CO")}</span>
+                                                                 </div>
+                                                                 <div>
+                                                                      <span>Pagado: </span>
+                                                                      <span> ${val.pagado.toLocaleString("es-CO")}</span>
+                                                                 </div>
+                                                                 <div>
+                                                                      <span>Deuda:</span>
+                                                                      <span> ${val.deuda.toLocaleString("es-CO")}</span>
+                                                                 </div>
+                                                                 <div>
+                                                                      <span>Atraso: </span>
+                                                                      <span> {val.atraso}</span>
+                                                                 </div>
+                                                                 {width < 1309 ? <div></div> : ""}
+                                                            </div>
+                                                            <hr className="mb-3" />
+                                                            <div className="flex w-full flex-wrap justify-between [&>div]:w-[49%] sm:[&>div]:w-full mb-2 sm:gap-4">
+                                                                 <div className=" justify-start items-center flex flex-col">
+                                                                      <div className="w-fit sm:w-full">
+                                                                           <span className="w-full justify-start font-medium text-lg">
+                                                                                Cuotas
+                                                                           </span>
+                                                                           <div>
+                                                                                {ready ? <CuadriculaCuotas cuotas={val.numCuotas} fecha={[...val.listaCuotas]} /> : ""}
+                                                                           </div>
+                                                                      </div>
+                                                                 </div>
+
+                                                                 <div
+                                                                      className={
+                                                                           " justify-start items-center flex-col flex  sm:[&_.ant-table-wrapper]:!max-h-[400px] [&_td]:text-sm"
+                                                                      }
+                                                                 >
+                                                                      <div className="w-fit [&_tbody_tr_td:first-child]:border-l [&_tbody_tr_td:last-child]:border-r [&_.ant-table-body]:!min-h-[161px] [&_.ant-table-wrapper]:border-b [&_.ant-table-wrapper]:max-h-[400px]">
+                                                                           <span className="font-medium text-lg">Historial</span>
+                                                                           <CustomTable
+                                                                                columns={columnsHistorial}
+                                                                                dataSource={historial}
+                                                                           />
+                                                                      </div>
                                                                  </div>
                                                             </div>
                                                        </div>
 
-                                                       <div
-                                                            className={
-                                                                 " justify-start items-center flex-col flex  sm:[&_.ant-table-wrapper]:!max-h-[400px] [&_td]:text-sm"
-                                                            }
-                                                       >
-                                                            <div className="w-fit [&_tbody_tr_td:first-child]:border-l [&_tbody_tr_td:last-child]:border-r [&_.ant-table-body]:!min-h-[161px] [&_.ant-table-wrapper]:border-b [&_.ant-table-wrapper]:max-h-[400px]">
-                                                                 <span className="font-medium text-lg">Historial</span>
-                                                                 <CustomTable
-                                                                      columns={columnsHistorial}
-                                                                      dataSource={historial}
-                                                                 />
-                                                            </div>
-                                                       </div>
-                                                  </div>
-                                             </div>
-                                        </SwiperSlide>
-                                        <SwiperSlide>hola x 2</SwiperSlide>
+                                                  </SwiperSlide>
+                                             )
+                                        })}
+
+
+
                                    </Swiper>
                               </div>
                          </CustomCard>
                          <div className="flex gap-4 w-full sm:flex-col [&_.ant-collapse]:w-full [&_.ant-collapse-content-box]:flex [&_.ant-collapse-content-box]:gap-4 sm:[&_.ant-collapse-content-box]:justify-center [&_.ant-collapse-content-box]:flex-wrap ">
                               <Collapse>
                                    <Panel key={"1"} header={"Fotos"}>
+
+
                                         <Image.PreviewGroup>
-                                             <Image
+                                             {imagenes.map((data, i) => {
+                                                  return <Image
 
-                                                  onClick={() => handlepruebainsert(1)}
-                                                  width={150}
-                                                  src="https://redgol.cl/__export/1586119895268/sites/redgol/img/2020/04/05/homero-simpson-1200x630_1.jpg_242310155.jpg"
+                                                       onClick={() => handlepruebainsert(1)}
+                                                       width={150}
+                                                       src={data}
 
 
-                                             />
-                                             <Image
-                                                  onClick={() => handlepruebainsert(2)}
-                                                  width={150}
-                                                  src="https://redgol.cl/__export/1586119895268/sites/redgol/img/2020/04/05/homero-simpson-1200x630_1.jpg_242310155.jpg"
-                                             />
-                                             <Image
-                                                  onClick={() => handlepruebainsert(3)}
-                                                  width={150}
-                                                  src="https://redgol.cl/__export/1586119895268/sites/redgol/img/2020/04/05/homero-simpson-1200x630_1.jpg_242310155.jpg"
-                                             />
+                                                  />
+                                             })}
+
+
                                              <div>asd</div>
                                         </Image.PreviewGroup>
                                    </Panel>
@@ -387,7 +473,7 @@ export default function Cliente() {
                          </div>
                          {visible ? <Prueba23 cuadro={document.getElementsByClassName("ant-image-preview-operations")[0] as HTMLElement} /> : ""}
                          <div id="prueba"></div>
-                         <Button type="primary" onClick={() => router.push('https://www.google.com.ar/maps/place/-24.89129884149519,+-65.49758661741734/@-24.89129884149519,+-65.49758661741734')}>
+                         <Button type="primary" onClick={() => { var pru = DatosApiCliente("asd"); }}>
                               Presioname Duro
                          </Button>
                     </div>
@@ -400,15 +486,29 @@ interface Historial {
      Fecha: Date;
      Observacion: string;
 }
-interface Direcciones {
-     Direccion: string;
-     Referencia: string;
-     Observacion: string;
-     /**
-      * Verdadero si es la direccion principal del cliente
-      */
-     Principal?: boolean;
-}
+
 interface ModalInterface {
      Tipo: "nombre" | "direccion" | "negocio" | undefined;
+}
+function obtenerPosicion() {
+     if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+               console.log("Latitude is :", position.coords.latitude);
+               console.log("Longitude is :", position.coords.longitude);
+          });
+     } else {
+          console.log("Not Available");
+     }
+
+}
+export const getServerSideProps: GetServerSideProps = async (context) => {
+     const res = await DatosApiCliente(String(context.params));
+
+     const data: ClienteInterface | null = res;
+
+     return {
+          props: {
+               data
+          }
+     }
 }

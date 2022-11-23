@@ -8,7 +8,8 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 const { Option } = Select;
-export default function CustomTable(props: customTableProps) {
+
+function CustomTable(props: customTableProps) {
      const [Estado, setEstado] = useState<boolean>(false);
      const [modalOpen, setModalOpen] = useState<boolean>(false);
      const [selectionModal, setSelectionModal] = useState<number>(0);
@@ -220,7 +221,7 @@ export default function CustomTable(props: customTableProps) {
                </Modal>
                <Table
                     {...rowSelect1}
-                    className={"flex flex-col overflow-y-auto  [&_.ant-table-cell-row-hover]:!bg-transparent [&_.ant-table-tbody]:group [&_.ant-table-tbody>tr]:group-hover:bg-black"}
+                    className={"flex flex-col overflow-y-auto  [&_.ant-table-cell-row-hover]:!bg-[#2c81432b] "}
                     size="small"
                     dataSource={props.dataSource}
                     columns={props.columns}
@@ -266,3 +267,4 @@ CustomTable.defaultProps = {
      tabla: "fila"
 };
 
+export default CustomTable;
