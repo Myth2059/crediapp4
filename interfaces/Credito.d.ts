@@ -55,12 +55,20 @@ export interface Credito {
    * un objeto[] de tipo historialCredito
    */
   historial: HistorialCredito[];
+
+  listaDiariaPagos: ListaDiariaPagos[];
 }
 
 export interface HistorialCredito {
+  key: number | string;
   id: number;
   idCredito: number;
   motivo: string;
   fecha: Date | string;
   observacion: string;
+}
+export interface ListaDiariaPagos {
+  id: number;
+  fecha: Date | string;
+  valor: number;
 }

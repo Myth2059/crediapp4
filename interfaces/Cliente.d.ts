@@ -47,6 +47,8 @@ export interface ClienteInterface {
   creditos: Credito[];
 }
 export interface Direccion {
+  key: string;
+  id: number;
   direccion: string;
   referencia: string;
   observacion: string;

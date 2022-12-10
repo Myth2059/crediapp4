@@ -31,7 +31,7 @@
 }
 @media (min-width: 1000px) {
   .Cuadricula {
-    grid-template-columns: repeat(6, minmax(20px, 50px));
+    grid-template-columns: repeat(6, minmax(20px, 58px));
     width: fit-content !important;
   }
   .Cuadricula > div:nth-child(5n + 0) {

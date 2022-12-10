@@ -221,7 +221,7 @@ function CustomTable(props: customTableProps) {
                </Modal>
                <Table
                     {...rowSelect1}
-                    className={"flex flex-col overflow-y-auto  [&_.ant-table-cell-row-hover]:!bg-[#2c81432b] "}
+                    className={"flex flex-col overflow-y-auto lg:scrollbar-thin lg:pr-[6px] lg:scrollbar-track-emerald-green-bgScroll lg:scrollbar-thumb-emerald-green [&_.ant-table-cell-row-hover]:!bg-[#2c81432b] "}
                     size="small"
                     dataSource={props.dataSource}
                     columns={props.columns}

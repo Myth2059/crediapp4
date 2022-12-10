@@ -11,6 +11,7 @@ module.exports = {
             'emerald-green': '#24695c',
             'gray-bgg':'#24695c1a',
             'emerald-green-2':'#125649',
+            'emerald-green-bgScroll':'#24695c59',            
             'arena':'#ba895d',
             'arena-oscura':'#a26d3c'
           },
@@ -22,5 +23,5 @@ module.exports = {
              }
     },
   },
-  plugins: [],
+  plugins: [ require('tailwind-scrollbar'),],
 }
